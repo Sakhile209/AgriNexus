@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNexus | Connected Agriculture Platform</title>
+    <meta
+      name="description"
+      content="AgriNexus is a digital agriculture ecosystem connecting farmers, cooperatives, governments, suppliers, buyers, and consumers."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="public/AgriNexus-logo.svg" alt="AgriNexus logo" />
+        <span>AgriNexus</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#platform">Platform</a>
+        <a href="#modules">Modules</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#docs">Docs</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">Digital agriculture for resilient food systems</p>
+          <h1>Modernize farming with a connected agricultural platform.</h1>
+          <p class="hero-copy">
+            AgriNexus unifies farm operations, livestock health management,
+            weather intelligence, marketplace access, and actionable insights
+            for farmers, cooperatives, public agencies, suppliers, and buyers.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#docs">Explore the platform</a>
+            <a class="btn btn-secondary" href="#modules">Review core modules</a>
+          </div>
+          <ul class="hero-highlights">
+            <li>Livestock health monitoring and vaccination planning</li>
+            <li>Crop intelligence, weather alerts, and market insights</li>
+            <li>Trusted marketplace access for buying and selling</li>
+          </ul>
+        </div>
+        <div class="hero-card" aria-label="AgriNexus dashboard preview">
+          <div class="card-header">
+            <span class="status-pill">Live insights</span>
+            <span class="status-pill muted">MVP-ready</span>
+          </div>
+          <div class="metric-grid">
+            <div class="metric">
+              <strong>+18%</strong>
+              <span>Yield uplift</span>
+            </div>
+            <div class="metric">
+              <strong>94%</strong>
+              <span>Vaccination coverage</span>
+            </div>
+            <div class="metric">
+              <strong>R 42k</strong>
+              <span>Market value tracked</span>
+            </div>
+          </div>
+          <div class="dashboard-preview">
+            <img src="images/dashboard.png" alt="Dashboard" />
+          </div>
+          <div class="chart-card">
+            <h3>Production overview</h3>
+            <div class="bars">
+              <span style="height: 45%"></span>
+              <span style="height: 82%"></span>
+              <span style="height: 64%"></span>
+              <span style="height: 90%"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Live platform demo</p>
+          <h2>Experience the core AgriNexus workflows in action.</h2>
+        </div>
+        <div class="demo-grid">
+          <div class="panel">
+            <h3>Operational dashboard</h3>
+            <div class="metric-grid demo-metrics">
+              <div class="metric">
+                <strong id="dashboard-farmers">0</strong>
+                <span>Farmers</span>
+              </div>
+              <div class="metric">
+                <strong id="dashboard-farms">0</strong>
+                <span>Farms</span>
+              </div>
+              <div class="metric">
+                <strong id="dashboard-livestock">0</strong>
+                <span>Livestock</span>
+              </div>
+              <div class="metric">
+                <strong id="dashboard-orders">0</strong>
+                <span>Orders</span>
+              </div>
+              <div class="metric">
+                <strong id="dashboard-alerts">0</strong>
+                <span>Alerts</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Partner onboarding</h3>
+            <form id="register-form" class="stack-form">
+              <input id="register-name" placeholder="Full name" required />
+              <input id="register-email" type="email" placeholder="Email" required />
+              <select id="register-role">
+                <option value="farmer">Farmer</option>
+                <option value="cooperative">Cooperative</option>
+                <option value="government">Government</option>
+                <option value="supplier">Supplier</option>
+                <option value="buyer">Buyer</option>
+              </select>
+              <button type="submit">Register & sign in</button>
+            </form>
+            <div id="profile-panel" class="profile-panel" hidden>
+              <h4>Signed-in profile</h4>
+              <p><strong id="profile-name">—</strong></p>
+              <p id="profile-email">—</p>
+              <p id="profile-role">—</p>
+              <p id="profile-status">You are now signed in as a registered AgriNexus user.</p>
+            </div>
+            <p id="register-status" class="status-text">Ready to onboard a new partner.</p>
+          </div>
+
+          <div class="panel">
+            <h3>AI advisory assistant</h3>
+            <form id="ai-form" class="stack-form">
+              <textarea id="ai-question" rows="3" placeholder="Ask about vaccinations, soil, weather, or livestock health"></textarea>
+              <button type="submit">Get advice</button>
+            </form>
+            <p id="ai-response" class="status-text">Use the assistant to get actionable guidance.</p>
+          </div>
+
+          <div class="panel">
+            <h3>Marketplace overview</h3>
+            <div id="marketplace-items" class="market-grid"></div>
+          </div>
+
+          <div class="panel">
+            <h3>Operational alerts</h3>
+            <ul id="alerts-list" class="alerts-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt-section">
+        <div class="section-heading">
+          <p class="eyebrow">Farmer module</p>
+          <h2>Responsive registration, login, profile management, and farm oversight in one workspace.</h2>
+        </div>
+        <div class="farmer-module-grid">
+          <div class="panel">
+            <h3>Farmer registration</h3>
+            <form id="farmer-register-form" class="stack-form">
+              <div class="field-grid">
+                <input id="farmer-first-name" placeholder="First name" required />
+                <input id="farmer-last-name" placeholder="Last name" required />
+                <input id="farmer-email" type="email" placeholder="Email address" required />
+                <input id="farmer-phone" placeholder="Phone number" required />
+                <input id="farmer-password" type="password" placeholder="Password" required />
+                <input id="farmer-confirm-password" type="password" placeholder="Confirm password" required />
+                <input id="farmer-farm-name" placeholder="Farm name" required />
+                <input id="farmer-province" placeholder="Province" required />
+                <input id="farmer-district" placeholder="District" required />
+                <input id="farmer-gps" placeholder="GPS coordinates" />
+                <input id="farmer-farm-size" type="number" min="0" step="0.1" placeholder="Farm size (hectares)" />
+                <select id="farmer-farming-type">
+                  <option value="Livestock">Livestock</option>
+                  <option value="Crops">Crops</option>
+                  <option value="Mixed Farming" selected>Mixed Farming</option>
+                </select>
+              </div>
+              <input id="farmer-profile-photo" type="file" accept="image/*" />
+              <button type="submit">Create farmer account</button>
+            </form>
+            <p id="farmer-register-status" class="status-text">Create a secure profile and start managing farm operations.</p>
+          </div>
+
+          <div class="panel">
+            <h3>Secure login</h3>
+            <form id="farmer-login-form" class="stack-form">
+              <input id="farmer-login-email" type="email" placeholder="Email address" required />
+              <input id="farmer-login-password" type="password" placeholder="Password" required />
+              <label class="checkbox-row"><input id="farmer-remember" type="checkbox" checked /> Remember me</label>
+              <button type="submit">Sign in</button>
+            </form>
+            <div class="inline-actions">
+              <button class="link-btn" id="farmer-forgot-password" type="button">Forgot password</button>
+              <button class="link-btn" id="farmer-verify-email" type="button">Verify email</button>
+            </div>
+            <p id="farmer-login-status" class="status-text">Use your email and password to access the farmer workspace.</p>
+          </div>
+
+          <div class="panel">
+            <h3>Farmer profile & farm overview</h3>
+            <div id="profile-card" class="profile-card">
+              <strong id="profile-card-name">Farmer profile</strong>
+              <span id="profile-card-farm">No active farm profile yet</span>
+              <p id="profile-card-email">Complete registration to view profile details</p>
+              <p id="profile-card-status">Account status: Pending Review</p>
+            </div>
+            <form id="farmer-profile-form" class="stack-form">
+              <div class="field-grid">
+                <input id="profile-first-name" placeholder="First name" />
+                <input id="profile-last-name" placeholder="Last name" />
+                <input id="profile-phone" placeholder="Phone number" />
+                <input id="profile-farm-name" placeholder="Farm name" />
+                <input id="profile-farm-location" placeholder="Farm location" />
+                <input id="profile-gps" placeholder="GPS coordinates" />
+                <input id="profile-farm-size" type="number" min="0" step="0.1" placeholder="Farm size (ha)" />
+                <select id="profile-farming-type">
+                  <option value="Livestock">Livestock</option>
+                  <option value="Crops">Crops</option>
+                  <option value="Mixed Farming">Mixed Farming</option>
+                </select>
+              </div>
+              <input id="profile-photo" type="file" accept="image/*" />
+              <label class="checkbox-row"><input id="notify-email" type="checkbox" checked /> Email notifications</label>
+              <label class="checkbox-row"><input id="notify-sms" type="checkbox" checked /> SMS reminders</label>
+              <label class="checkbox-row"><input id="notify-push" type="checkbox" /> Push alerts</label>
+              <button type="submit">Save profile</button>
+            </form>
+            <p id="farmer-profile-status" class="status-text">Update personal details, contact info, and notification preferences.</p>
+          </div>
+
+          <div class="panel">
+            <h3>Dashboard overview</h3>
+            <div class="metric-grid demo-metrics">
+              <div class="metric">
+                <strong id="dash-livestock">0</strong>
+                <span>Total livestock</span>
+              </div>
+              <div class="metric">
+                <strong id="dash-crops">0</strong>
+                <span>Total crops</span>
+              </div>
+              <div class="metric">
+                <strong id="dash-vaccinations">0</strong>
+                <span>Upcoming vaccinations</span>
+              </div>
+              <div class="metric">
+                <strong id="dash-weather">0</strong>
+                <span>Weather alerts</span>
+              </div>
+              <div class="metric">
+                <strong id="dash-market">0</strong>
+                <span>Market updates</span>
+              </div>
+            </div>
+            <div class="inline-actions">
+              <button class="link-btn" id="check-weather-button" type="button">Check weather</button>
+            </div>
+            <p id="weather-output" class="status-text">View today's weather outlook and rainfall conditions.</p>
+            <h4>Recent farm activity</h4>
+            <ul id="recent-activities" class="alerts-list"></ul>
+          </div>
+
+          <div class="panel">
+            <h3>Add another farm</h3>
+            <form id="add-farm-form" class="stack-form">
+              <input id="farm-name" placeholder="Farm name" required />
+              <input id="farm-location" placeholder="Farm location" required />
+              <input id="farm-size" type="number" step="0.1" min="0" placeholder="Farm size (ha)" required />
+              <input id="farm-gps" placeholder="GPS coordinates" />
+              <select id="farm-type">
+                <option value="Livestock">Livestock</option>
+                <option value="Crops">Crops</option>
+                <option value="Mixed Farming" selected>Mixed Farming</option>
+              </select>
+              <button type="submit">Add farm</button>
+            </form>
+            <p id="farm-status" class="status-text">Add multiple farms and keep records in one place.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="platform" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Platform scope</p>
+          <h2>Designed for every stakeholder in the agricultural value chain.</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <h3>Farmers</h3>
+            <p>Manage farms, livestock, crop activities, reminders, alerts, and reporting from a single platform.</p>
+          </article>
+          <article>
+            <h3>Cooperatives</h3>
+            <p>Coordinate production monitoring, member engagement, and reporting with greater visibility.</p>
+          </article>
+          <article>
+            <h3>Government</h3>
+            <p>Track disease outbreaks, drought indicators, and regional production trends in real time.</p>
+          </article>
+          <article>
+            <h3>Suppliers</h3>
+            <p>List seed, feed, fertilizer, and equipment products while reaching buyers more effectively.</p>
+          </article>
+          <article>
+            <h3>Buyers</h3>
+            <p>Source products, compare prices, and manage purchasing workflows with confidence.</p>
+          </article>
+          <article>
+            <h3>Consumers</h3>
+            <p>Discover fresh produce and locally sourced farm products through a transparent marketplace.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Farmer capabilities</p>
+          <h2>Core tools designed to improve productivity, compliance, and decision-making.</h2>
+        </div>
+        <div class="feature-list-card">
+          <h3>Farmer Features</h3>
+          <ul>
+            <li>Farmer registration and profile management</li>
+            <li>Farm registration</li>
+            <li>Livestock tracking</li>
+            <li>Animal health records</li>
+            <li>Vaccination reminders</li>
+            <li>Birth and death records</li>
+            <li>Crop monitoring</li>
+            <li>Planting and harvesting records</li>
+            <li>Weather alerts</li>
+            <li>Market price updates</li>
+            <li>Farm reports and analytics</li>
+            <li>AI farming assistant</li>
+            <li>Notifications and alerts</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="modules" class="section alt-section">
+        <div class="section-heading">
+          <p class="eyebrow">Core modules</p>
+          <h2>From field intelligence to digital marketplace trading.</h2>
+        </div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>Farm Operations</h3>
+            <p>Support crop planning, harvest tracking, livestock records, vaccination schedules, and health alerts.</p>
+          </article>
+          <article class="module-card">
+            <h3>AI Assistant</h3>
+            <p>Deliver crop disease guidance, seasonal planting recommendations, and practical disease prevention advice.</p>
+          </article>
+          <article class="module-card">
+            <h3>Marketplace</h3>
+            <p>Enable buyers and consumers to search, compare, connect with producers, and place orders efficiently.</p>
+          </article>
+          <article class="module-card">
+            <h3>Analytics & Reports</h3>
+            <p>Provide role-based dashboards for operational, financial, and policy performance insights.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="roadmap" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Delivery roadmap</p>
+          <h2>Structured for a focused MVP launch and phased national scale-up.</h2>
+        </div>
+        <div class="timeline">
+          <div>
+            <h3>Phase 1</h3>
+            <p>Launch farmer onboarding, farm management, livestock tracking, and essential marketplace tools.</p>
+          </div>
+          <div>
+            <h3>Phase 2</h3>
+            <p>Expand with AI advisory, weather integration, advanced dashboards, and supplier tools.</p>
+          </div>
+          <div>
+            <h3>Phase 3</h3>
+            <p>Scale into government reporting, cooperative management, regional expansion, and advanced analytics.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="docs" class="section cta-section">
+        <h2>All product, architecture, and business deliverables are ready.</h2>
+        <p>Review the business plan, platform architecture, database design, API framework, and investment narrative in one place.</p>
+        <a class="btn btn-primary" href="docs/README.md">Open the documentation hub</a>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
