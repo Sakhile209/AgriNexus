@@ -27,6 +27,7 @@
         <a href="#modules">Modules</a>
         <a href="#roadmap">Roadmap</a>
         <a href="#docs">Docs</a>
+        <a class="btn btn-primary" href="register.html">Sign-in</a>
       </nav>
     </header>
 
@@ -117,30 +118,6 @@
           </div>
 
           <div class="panel">
-            <h3>Partner onboarding</h3>
-            <form id="register-form" class="stack-form">
-              <input id="register-name" placeholder="Full name" required />
-              <input id="register-email" type="email" placeholder="Email" required />
-              <select id="register-role">
-                <option value="farmer">Farmer</option>
-                <option value="cooperative">Cooperative</option>
-                <option value="government">Government</option>
-                <option value="supplier">Supplier</option>
-                <option value="buyer">Buyer</option>
-              </select>
-              <button type="submit">Register & sign in</button>
-            </form>
-            <div id="profile-panel" class="profile-panel" hidden>
-              <h4>Signed-in profile</h4>
-              <p><strong id="profile-name">—</strong></p>
-              <p id="profile-email">—</p>
-              <p id="profile-role">—</p>
-              <p id="profile-status">You are now signed in as a registered AgriNexus user.</p>
-            </div>
-            <p id="register-status" class="status-text">Ready to onboard a new partner.</p>
-          </div>
-
-          <div class="panel">
             <h3>AI advisory assistant</h3>
             <form id="ai-form" class="stack-form">
               <textarea id="ai-question" rows="3" placeholder="Ask about vaccinations, soil, weather, or livestock health"></textarea>
@@ -178,7 +155,21 @@
                 <input id="farmer-password" type="password" placeholder="Password" required />
                 <input id="farmer-confirm-password" type="password" placeholder="Confirm password" required />
                 <input id="farmer-farm-name" placeholder="Farm name" required />
-                <input id="farmer-province" placeholder="Province" required />
+                <div>
+                <label for="province">Province</label>
+                <select value="" type="choice">
+                  <option value="Gauteng">Eastern Cape</option>
+                <option value="Free State">Free State</option>
+                <option value="Mpumalanga">Mpumalanga</option>
+                <option value="Western Cape">Western Cape</option>
+                <option value="North West">North West</option>
+                <option value="Northern Cape">Northern Cape</option>
+                <option value="Gauteng">Gauteng</option>
+                <option value="Limpopo">Limpopo</option>
+                <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                </select>
+                
+                </div>
                 <input id="farmer-district" placeholder="District" required />
                 <input id="farmer-gps" placeholder="GPS coordinates" />
                 <input id="farmer-farm-size" type="number" min="0" step="0.1" placeholder="Farm size (hectares)" />

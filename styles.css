@@ -347,7 +347,7 @@ article {
   margin-top: 1.3rem;
 }
 
-.panel {
+/* .panel {
   background: white;
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -405,6 +405,29 @@ article {
 .profile-panel p {
   margin: 0.2rem 0;
   color: var(--muted);
+} */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding-top: 150px; 
+}
+
+
+.stack-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stack-form input,
+.stack-form select,
+.stack-form button {
+    width: 800px;
+    padding: 10px;
+    border-radius: 12px;
 }
 
 .farmer-module-grid {
