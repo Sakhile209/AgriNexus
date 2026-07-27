@@ -96,6 +96,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function renderFarms(farms = []) {
+    const list = document.getElementById('farms-list');
+    if (!list) return;
+
+    if (!farms.length) {
+      list.innerHTML = '<li>No farms added yet. Use the form above to grow your portfolio.</li>';
+      return;
+    }
+
+    list.innerHTML = farms.map((farm) => `
+      <li class="farm-list-item">
+        <strong>${farm.name}</strong>
+        <div>${farm.location || 'Location pending'} • ${farm.farmingType || 'Mixed Farming'}</div>
+        <button class="link-btn remove-farm-btn" data-farm-id="${farm.id}" type="button">Remove</button>
+      </li>
+    `).join('');
+  }
+
   function renderFarmerProfile(profile) {
     if (!profile || !profile.user) return;
     const user = profile.user;
@@ -119,10 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('profile-farming-type').value = user.farmingType || 'Mixed Farming';
       document.getElementById('profile-farm-size').value = user.farmSizeHa || '';
       document.getElementById('profile-gps').value = user.gpsCoordinates || '';
+      document.getElementById('profile-farming-activities').value = profile.farmingActivities || '';
       document.getElementById('notify-email').checked = user.notificationPrefs?.email !== false;
       document.getElementById('notify-sms').checked = user.notificationPrefs?.sms !== false;
       document.getElementById('notify-push').checked = Boolean(user.notificationPrefs?.push);
     }
+
+    renderFarms(profile.farms || []);
   }
 
   async function renderFarmerDashboard() {
@@ -290,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
           farmingType: document.getElementById('profile-farming-type').value,
           farmSizeHa: document.getElementById('profile-farm-size').value,
           gpsCoordinates: document.getElementById('profile-gps').value,
+          farmingActivities: document.getElementById('profile-farming-activities').value,
           profilePhoto: document.getElementById('profile-photo').files[0] ? document.getElementById('profile-photo').files[0].name : stored.profilePhoto || 'default.jpg',
           notificationPrefs: {
             email: document.getElementById('notify-email').checked,
@@ -325,8 +347,53 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await fetchJson('/farms', { method: 'POST', body: JSON.stringify(payload) });
         if (result.success) {
           setStatus('farm-status', 'Additional farm added to your profile.');
+          const restored = await fetchJson(`/farmers/profile?email=${encodeURIComponent(stored.email)}`);
+          if (restored.success) {
+            renderFarmerProfile(restored.profile);
+          }
         } else {
           setStatus('farm-status', result.message || 'Unable to add farm.', true);
+        }
+      });
+    }
+
+    const passwordForm = document.getElementById('change-password-form');
+    if (passwordForm) {
+      passwordForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const stored = JSON.parse(localStorage.getItem('agriNexusFarmer') || '{}');
+        const payload = {
+          email: stored.email,
+          currentPassword: document.getElementById('current-password').value,
+          newPassword: document.getElementById('new-password').value,
+          confirmPassword: document.getElementById('confirm-new-password').value
+        };
+        const result = await fetchJson('/farmers/password', { method: 'POST', body: JSON.stringify(payload) });
+        if (result.success) {
+          setStatus('password-status', 'Password updated successfully.');
+          passwordForm.reset();
+        } else {
+          setStatus('password-status', result.message || 'Unable to update password.', true);
+        }
+      });
+    }
+
+    const farmsList = document.getElementById('farms-list');
+    if (farmsList) {
+      farmsList.addEventListener('click', async (event) => {
+        const button = event.target.closest('.remove-farm-btn');
+        if (!button) return;
+        const stored = JSON.parse(localStorage.getItem('agriNexusFarmer') || '{}');
+        const farmId = button.dataset.farmId;
+        const result = await fetchJson(`/farms?id=${encodeURIComponent(farmId)}&email=${encodeURIComponent(stored.email)}`, { method: 'DELETE' });
+        if (result.success) {
+          const restored = await fetchJson(`/farmers/profile?email=${encodeURIComponent(stored.email)}`);
+          if (restored.success) {
+            renderFarmerProfile(restored.profile);
+            setStatus('farm-status', 'Farm removed from your portfolio.');
+          }
+        } else {
+          setStatus('farm-status', result.message || 'Unable to remove farm.', true);
         }
       });
     }
@@ -335,9 +402,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (weatherButton) {
       weatherButton.addEventListener('click', async () => {
         try {
-          const weatherData = await fetchJson('/weather');
+          const stored = JSON.parse(localStorage.getItem('agriNexusFarmer') || '{}');
+          const location = stored?.farmLocation || stored?.province || 'Limpopo';
+          const weatherData = await fetchJson(`/weather?location=${encodeURIComponent(location)}`);
           const weather = Array.isArray(weatherData) ? weatherData[0] : weatherData;
-          document.getElementById('weather-output').textContent = `${weather.alert || 'Weather outlook'} • ${weather.temperatureC}°C • Rain chance ${weather.chanceOfRain}%`;
+          document.getElementById('weather-output').textContent = `${weather.alert || 'Weather outlook'} • ${weather.temperatureC}°C • ${weather.region || location} • Rain ${weather.chanceOfRain}% • ${weather.source || 'forecast'}`;
         } catch (error) {
           document.getElementById('weather-output').textContent = error.message || 'Unable to load weather.';
         }

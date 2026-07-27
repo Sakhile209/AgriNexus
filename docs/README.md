@@ -6,6 +6,17 @@ AgriNexus is a digital agriculture ecosystem designed to help farmers improve pr
 
 This documentation set captures the complete product blueprint for AgriNexus, covering business strategy, system architecture, data design, user experience, implementation planning, and growth strategy.
 
+## Current Implementation Status
+
+A working Node.js prototype of AgriNexus is now available in the workspace, with a polished landing experience, farmer onboarding flow, marketplace preview, AI assistant interaction, and API-backed dashboard data.
+
+Run it locally with:
+
+- `npm install`
+- `npm start`
+
+Then open http://localhost:3000/
+
 ## Core Deliverables
 
 ### Business and Strategy

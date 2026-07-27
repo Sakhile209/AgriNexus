@@ -1,13 +1,13 @@
 # AgriNexus System Architecture
 
 ## 1. Frontend Architecture
-- Web: React.js with TypeScript
+- Web: Next.js + React + Tailwind CSS
 - Mobile: Flutter for Android and iOS
 - Design approach: mobile-first, responsive, role-based dashboards
-- State management: React Query + Zustand for web and Riverpod for Flutter
+- State visualization: Recharts for analytics, maps via Google Maps API
 
 ## 2. Backend Architecture
-- Spring Boot microservices architecture
+- Spring Boot services for core business domains
 - Core services:
   - User & identity service
   - Farm & livestock service
@@ -16,6 +16,7 @@
   - Notification service
   - Analytics & reporting service
   - AI advisory service
+- Authentication: JWT + Spring Security
 - API gateway for routing, throttling, and authentication
 
 ## 3. Database Architecture
@@ -24,7 +25,7 @@
 - Caching layer for weather and pricing data
 
 ## 4. Cloud Architecture
-- Azure or AWS cloud deployment
+- Azure deployment target
 - Recommended Azure deployment:
   - Azure App Service or AKS for backend services
   - Azure Database for PostgreSQL
@@ -40,7 +41,8 @@
 - Role-based access control for all endpoints
 
 ## 6. Security Architecture
-- OAuth2 / OpenID Connect authentication
+- JWT + Spring Security authentication
+- OAuth2 / OpenID Connect support for future enterprise integration
 - MFA for admin and government users
 - Encryption at rest and in transit
 - Audit logs and immutable activity trails

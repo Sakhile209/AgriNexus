@@ -71,7 +71,7 @@
             </div>
           </div>
           <div class="dashboard-preview">
-            <img src="images/dashboard.png" alt="Dashboard" />
+            <img src="public/dashboard-preview.svg" alt="AgriNexus dashboard preview" />
           </div>
           <div class="chart-card">
             <h3>Production overview</h3>
@@ -156,19 +156,18 @@
                 <input id="farmer-confirm-password" type="password" placeholder="Confirm password" required />
                 <input id="farmer-farm-name" placeholder="Farm name" required />
                 <div>
-                <label for="province">Province</label>
-                <select value="" type="choice">
-                  <option value="Gauteng">Eastern Cape</option>
-                <option value="Free State">Free State</option>
-                <option value="Mpumalanga">Mpumalanga</option>
-                <option value="Western Cape">Western Cape</option>
-                <option value="North West">North West</option>
-                <option value="Northern Cape">Northern Cape</option>
-                <option value="Gauteng">Gauteng</option>
-                <option value="Limpopo">Limpopo</option>
-                <option value="KwaZulu-Natal">KwaZulu-Natal</option>
-                </select>
-                
+                  <label for="farmer-province">Province</label>
+                  <select id="farmer-province">
+                    <option value="Eastern Cape">Eastern Cape</option>
+                    <option value="Free State">Free State</option>
+                    <option value="Mpumalanga">Mpumalanga</option>
+                    <option value="Western Cape">Western Cape</option>
+                    <option value="North West">North West</option>
+                    <option value="Northern Cape">Northern Cape</option>
+                    <option value="Gauteng">Gauteng</option>
+                    <option value="Limpopo" selected>Limpopo</option>
+                    <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                  </select>
                 </div>
                 <input id="farmer-district" placeholder="District" required />
                 <input id="farmer-gps" placeholder="GPS coordinates" />
@@ -223,6 +222,7 @@
                   <option value="Mixed Farming">Mixed Farming</option>
                 </select>
               </div>
+              <textarea id="profile-farming-activities" rows="3" placeholder="Describe current farming activities, vaccination plans, and crop priorities"></textarea>
               <input id="profile-photo" type="file" accept="image/*" />
               <label class="checkbox-row"><input id="notify-email" type="checkbox" checked /> Email notifications</label>
               <label class="checkbox-row"><input id="notify-sms" type="checkbox" checked /> SMS reminders</label>
@@ -230,6 +230,23 @@
               <button type="submit">Save profile</button>
             </form>
             <p id="farmer-profile-status" class="status-text">Update personal details, contact info, and notification preferences.</p>
+
+            <div class="profile-actions-grid">
+              <div class="sub-panel">
+                <h4>Farm portfolio</h4>
+                <ul id="farms-list" class="alerts-list"></ul>
+              </div>
+              <div class="sub-panel">
+                <h4>Change password</h4>
+                <form id="change-password-form" class="stack-form">
+                  <input id="current-password" type="password" placeholder="Current password" required />
+                  <input id="new-password" type="password" placeholder="New password" required />
+                  <input id="confirm-new-password" type="password" placeholder="Confirm new password" required />
+                  <button type="submit">Update password</button>
+                </form>
+                <p id="password-status" class="status-text">Keep your account secure with a fresh password.</p>
+              </div>
+            </div>
           </div>
 
           <div class="panel">

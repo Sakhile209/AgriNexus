@@ -1,0 +1,18 @@
+<svg width="800" height="520" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="520" rx="28" fill="#F7FBF5"/>
+  <rect x="40" y="40" width="720" height="440" rx="24" fill="white" stroke="#DCEEDB" stroke-width="2"/>
+  <rect x="72" y="80" width="190" height="96" rx="18" fill="#EAF8EA"/>
+  <rect x="284" y="80" width="190" height="96" rx="18" fill="#EAF8EA"/>
+  <rect x="496" y="80" width="232" height="96" rx="18" fill="#EAF8EA"/>
+  <rect x="72" y="208" width="656" height="220" rx="20" fill="#F3FAF0"/>
+  <rect x="110" y="240" width="80" height="120" rx="12" fill="#3E9B4F"/>
+  <rect x="222" y="222" width="80" height="138" rx="12" fill="#1F6B3B"/>
+  <rect x="334" y="252" width="80" height="108" rx="12" fill="#7BC96F"/>
+  <rect x="446" y="204" width="80" height="156" rx="12" fill="#3E9B4F"/>
+  <rect x="558" y="238" width="80" height="122" rx="12" fill="#198754"/>
+  <circle cx="562" cy="140" r="22" fill="#1F6B3B"/>
+  <path d="M540 140C540 128.954 548.954 120 560 120H566C577.046 120 586 128.954 586 140V140C586 151.046 577.046 160 566 160H560C548.954 160 540 151.046 540 140V140Z" fill="#7BC96F"/>
+  <path d="M128 146H208" stroke="#1F6B3B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M340 146H420" stroke="#1F6B3B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M548 146H684" stroke="#1F6B3B" stroke-width="8" stroke-linecap="round"/>
+</svg>
