@@ -1,0 +1,22 @@
+/* Authenticated workspace theme inspired by the supplied farm-management reference. */
+.app-shell{grid-template-columns:238px 1fr;grid-template-rows:72px 1fr;background:linear-gradient(135deg,#effcf3 0,#f7f8f3 45%,#fff3c4 100%)}
+.app-shell>aside{width:238px;padding:1rem .75rem;border:8px solid #202320;border-radius:0 22px 22px 0;color:#cbd3ce;background:#171a18;box-shadow:8px 0 28px #0c1e1412}
+.side-brand{padding:.35rem .65rem 1.4rem}.side-brand .brand{color:#fff}.side-brand .brand-mark{display:grid;width:34px;height:34px;place-items:center;border:0;border-radius:8px;background:#11ad5c}.side-brand .brand strong>span{color:#60df91}
+.farm-switcher{margin:0 .45rem 1.25rem;color:#7f8b84;font-size:.58rem;letter-spacing:.08em}.farm-switcher select{min-height:2.7rem;padding:.65rem;border:1px solid #343a36;border-radius:.55rem;color:#f3f6f4;background:#242825}
+.app-shell aside nav{gap:.35rem}.app-shell aside nav button{min-height:43px;padding:.7rem .8rem;border-radius:.55rem;color:#aeb9b2;font-size:.74rem}.app-shell aside nav button:hover{color:#fff;background:#252a27}.app-shell aside nav button.active{color:#eaffef;background:#146b3b;box-shadow:inset 3px 0 #54e887}.app-shell aside nav button>span{font-size:1rem}
+.side-logout{margin:1rem .35rem .2rem;padding:.75rem;border-top:1px solid #313632;color:#98a39c}
+.app-shell>header{height:72px;margin:8px 12px 0 12px;padding:0 1.25rem;border:1px solid #e1e5df;border-radius:14px 14px 0 0;background:#fffffff2;backdrop-filter:blur(8px)}
+.header-icon{border:1px solid #e1e6e2;border-radius:8px;background:#f7f9f7}.user-menu{padding:.35rem .65rem;border:1px solid #e1e6e2;border-radius:10px;background:#fff}.user-menu>span{border-radius:8px;background:#149957}
+.workspace{width:min(1220px,calc(100% - 2rem));margin:0 auto 1rem;padding:2rem;border:1px solid #e1e5df;border-top:0;border-radius:0 0 16px 16px;background:#fbfcfb;box-shadow:0 20px 45px #16322212}
+.page-heading{align-items:center;margin-bottom:1.5rem}.page-heading h2{font-size:1.7rem;font-weight:650;letter-spacing:-.035em}.eyebrow.dark{color:#168e50}
+.primary{border-radius:8px;background:#16a45a}.primary:hover{background:#0d8c49}.quiet,.link{color:#11854a}
+.welcome-banner{padding:1.25rem 1.5rem;border:1px solid #dce8df;border-radius:12px;background:linear-gradient(100deg,#effaf2,#dff7e8)}
+.stats{gap:.65rem}.stats article{padding:1.15rem;border:1px solid #e1e7e2;border-radius:11px;box-shadow:none}.stats strong{color:#172d20;font-size:1.8rem}.stats span{color:#728078}
+.dashboard-grid{grid-template-columns:1.25fr 1fr;gap:.7rem}.card{border:1px solid #e0e6e1;border-radius:11px;box-shadow:none}.dashboard-grid>.card{min-height:190px}.dashboard-grid h3,.card h3{font-size:.8rem}
+.livestock-summary{background:#fff}.donut{border-color:#11a85b;border-right-color:#ffd048;border-bottom-color:#3ba9f4}
+.weather-card{position:relative;overflow:hidden;background:linear-gradient(145deg,#0b4028,#117647)}.weather-card:after{position:absolute;right:-35px;bottom:-55px;width:170px;height:170px;border:1px solid #ffffff26;border-radius:50%;content:""}.weather-value{font-size:3.7rem}
+.activity-card{background:#fff}.activity-list li{padding:.55rem .65rem;border-radius:7px;background:#f4f7f4}.alert-card{background:#fff8e1}.alert-card>strong{color:#d88a00}
+.form-grid input,.form-grid select,label input,label select{border-color:#dbe2dc;border-radius:8px;background:#fff}.inline-form{gap:.65rem}.table-wrap{border:1px solid #e4e9e5;border-radius:9px}th{background:#f4f7f4}th,td{border-color:#e8ece9}.badge{color:#08743d;background:#dcf7e7}
+.report-grid article{border-top:3px solid #21ad60}.notification-list li{padding:.85rem;border-radius:8px}.notification-list li:hover{background:#f4f8f5}
+.modal{border:1px solid #dce4de;border-radius:14px;box-shadow:0 28px 80px #081b1190}.segmented{border-radius:9px;background:#edf2ee}.segmented button{border-radius:7px}.segmented button.active{color:#096d39;background:#fff;box-shadow:0 2px 8px #16322218}
+@media(max-width:850px){.app-shell{grid-template-columns:1fr}.app-shell>aside{border-width:0;border-radius:0}.workspace{width:calc(100% - 1rem);padding:1rem}.dashboard-grid{grid-template-columns:1fr}.app-shell>header{margin:0;border-radius:0}}

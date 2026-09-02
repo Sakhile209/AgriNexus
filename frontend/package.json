@@ -1,0 +1,13 @@
+{
+  "name": "agrinexus-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite preview --config vite.config.js",
+    "preview": "vite preview --config vite.config.js"
+  },
+  "devDependencies": {
+    "vite": "^8.2.2"
+  }
+}
