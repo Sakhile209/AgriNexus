@@ -5,7 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "mobile": "npm --prefix mobile start",
+    "device": "npm --prefix mobile run device",
+    "android": "npm --prefix mobile run android",
+    "ios": "npm --prefix mobile run ios"
   },
   "engines": {
     "node": ">=18"

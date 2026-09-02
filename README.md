@@ -48,6 +48,45 @@ npm run dev -- --host 0.0.0.0
 
 Then open `http://<computer-ip-address>:5173` from the other device. Keep port `5173` private to trusted local networks; do not expose the development server directly to the public internet.
 
+## Android and iOS mobile app
+
+The cross-platform Expo React Native application is in `mobile/`. It supports Android and iOS from one TypeScript codebase and connects to the existing Spring API.
+
+Copy the example environment file and replace the address with the development computer's LAN IP when using a physical phone:
+
+```bash
+cd mobile
+cp .env.example .env
+npm install
+npm start
+```
+
+Install Expo Go on the Android or iOS device and scan the QR code shown by Expo. The phone and development computer must be on the same trusted network, and the Spring API must be listening on port `8080`.
+
+### Run on physical Android and iPhone devices from Linux
+
+The recommended command on this Linux computer is:
+
+```bash
+npm run device
+```
+
+Install Expo Go on the phone, connect the phone and computer to the same Wi-Fi network, then scan the displayed QR code. This works for both Android and iOS without installing Android Studio or Xcode.
+
+### Run with platform simulators
+
+```bash
+# From the repository root:
+npm run android
+npm run ios
+```
+
+`npm run android` requires Android Studio, the Android SDK, and `adb`. Set `ANDROID_HOME` to the installed SDK directory before using it. `npm run ios` requires macOS and Xcode; Apple does not provide the iOS Simulator for Linux.
+
+These root commands forward to the Expo project in `mobile/`. If your terminal is already inside `mobile/`, the corresponding commands work there directly.
+
+Use `http://10.0.2.2:8080/api/v1` for the Android emulator, `http://localhost:8080/api/v1` for the iOS simulator, or `http://<computer-ip-address>:8080/api/v1` for a physical device. Production builds should use an HTTPS API address.
+
 ## Demo capabilities
 
 - Farmer registration
