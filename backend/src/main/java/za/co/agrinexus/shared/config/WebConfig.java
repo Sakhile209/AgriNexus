@@ -12,6 +12,7 @@
 package za.co.agrinexus.shared.config;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,9 +23,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class WebConfig {
     @Bean
-    CorsConfigurationSource corsConfigurationSource(@Value(value="${agrinexus.cors.allowed-origin}") String allowedOrigin) {
+    CorsConfigurationSource corsConfigurationSource(@Value("${agrinexus.cors.allowed-origins}") String allowedOrigins) {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(allowedOrigin));
+        configuration.setAllowedOrigins(Stream.of(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList());
         configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(Boolean.valueOf(true));
