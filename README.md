@@ -27,6 +27,12 @@ AgriNexus is a digital agriculture platform that helps farmers manage livestock,
 3. Open the frontend at:
    `http://localhost:3000/`
 
+## Scan to open the website
+
+Connect your phone to the same Wi-Fi network as the development computer, then scan this QR code to open AgriNexus at [http://192.168.0.234:5173](http://192.168.0.234:5173):
+
+![QR code for the AgriNexus website](frontend/dist/agrinexus-website-qr.png)
+
 ## Current React application hosts
 
 The reconstructed React and Spring Boot application uses the following local hosts:
