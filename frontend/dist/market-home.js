@@ -1,3 +1,4 @@
+import {escapeHtml as e} from './live-data.js'
 const money = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' })
 
 async function getJson(path) {
@@ -22,9 +23,9 @@ async function mountMarketHome() {
   section.id = 'live-markets'
   section.className = 'live-markets'
   section.innerHTML = `
-    <p class="section-kicker">LIVE MARKET INTELLIGENCE</p>
-    <h2>Prices and produce available now</h2>
-    <p class="section-lead">API-backed updates from AgriNexus market contributors and sellers.</p>
+    <p class="section-kicker">SOUTH AFRICAN MARKET INFORMATION</p>
+    <h2>Published prices and farmer listings</h2>
+    <p class="section-lead">Market reference publications and farmer offers, displayed separately with their sources.</p>
     <div class="live-market-columns">
       <div><div class="live-market-heading"><h3>Market prices</h3><span id="price-status">Updating…</span></div><div id="market-price-list" class="live-market-grid"></div></div>
       <div><div class="live-market-heading"><h3>Marketplace</h3><span id="listing-status">Loading…</span></div><div id="marketplace-list" class="live-market-grid"></div></div>
@@ -45,8 +46,9 @@ async function mountMarketHome() {
   try {
     const prices = await getJson('/api/v1/market-prices')
     const target = section.querySelector('#market-price-list')
-    prices.slice(0, 4).forEach(item => target.append(card(`<span>${item.market} · ${item.province}</span><h4>${item.commodity}</h4><strong>${money.format(item.priceZar)} <small>/ ${item.unit}</small></strong><em>${item.source}</em>`)))
-    section.querySelector('#price-status').textContent = prices.length ? `Updated ${new Date(prices[0].capturedAt).toLocaleString('en-ZA')}` : 'No prices yet'
+    prices.slice(0, 4).forEach(item => target.append(card(`<span>${e(item.market)} · ${e(item.province)}</span><h4>${e(item.commodity)}</h4><strong>${money.format(item.priceZar)} <small>/ ${e(item.unit)}</small></strong><em>${e(item.source)} · Published ${e(item.publishedOn)}</em>`)))
+    if (!prices.length) target.textContent = 'No verified price feed is currently available. Open Joburg Market or SAGIS for published reports.'
+    section.querySelector('#price-status').textContent = prices.length ? 'Latest available publications' : 'No licensed price feed configured'
   } catch (error) {
     section.querySelector('#price-status').textContent = error.message
   }
@@ -54,7 +56,7 @@ async function mountMarketHome() {
   try {
     const listings = await getJson('/api/v1/marketplace/listings')
     const target = section.querySelector('#marketplace-list')
-    listings.slice(0, 4).forEach(item => target.append(card(`<span>${item.category} · ${item.location}</span><h4>${item.title}</h4><strong>${money.format(item.priceZar)} <small>/ ${item.unit}</small></strong><em>${item.quantity} ${item.unit} available</em>`)))
+    listings.slice(0, 4).forEach(item => target.append(card(`<span>${e(item.category)} · ${e(item.location)}</span><h4>${e(item.title)}</h4><strong>${money.format(item.priceZar)} <small>/ ${e(item.unit)}</small></strong><em>${e(item.quantity)} ${e(item.unit)} available</em>`)))
     section.querySelector('#listing-status').textContent = `${listings.length} active listing${listings.length === 1 ? '' : 's'}`
   } catch (error) {
     section.querySelector('#listing-status').textContent = error.message
@@ -62,7 +64,7 @@ async function mountMarketHome() {
   return true
 }
 
-if (!await mountMarketHome()) {
-  const observer = new MutationObserver(async () => { if (await mountMarketHome()) observer.disconnect() })
-  observer.observe(document.body, { childList: true, subtree: true })
-}
+let mounting=false
+const observer = new MutationObserver(async () => { if(mounting)return;mounting=true;try{await mountMarketHome()}finally{mounting=false} })
+observer.observe(document.body,{childList:true,subtree:true})
+await mountMarketHome()

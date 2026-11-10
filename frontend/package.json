@@ -4,10 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "api": "java -jar ../backend/target/agrinexus-api-0.1.0-SNAPSHOT.jar --server.port=8081",
+    "test": "node --test",
     "dev": "vite preview --config vite.config.js",
-    "preview": "vite preview --config vite.config.js"
+    "preview": "vite preview --config vite.config.js",
+    "sync:assets": "node scripts/sync-assets.mjs",
+    "predev": "npm run sync:assets",
+    "prepreview": "npm run sync:assets"
   },
   "devDependencies": {
-    "vite": "^8.2.2"
+    "maplibre-gl": "^6.17.0",
+    "vite": "^8.3.7"
   }
 }

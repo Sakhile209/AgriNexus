@@ -1,0 +1,3 @@
+.git
+target/*
+!target/agrinexus-api-0.1.0-SNAPSHOT.jar

@@ -27,6 +27,16 @@ import za.co.agrinexus.shared.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    ResponseEntity<ApiError> requestFailure(org.springframework.web.server.ResponseStatusException e) {
+        return ResponseEntity.status(e.getStatusCode()).body(ApiError.of("REQUEST_FAILED", e.getReason() == null ? "Request could not be completed." : e.getReason()));
+    }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiError> uploadTooLarge() {
+        return ResponseEntity.badRequest().body(ApiError.of("UPLOAD_TOO_LARGE", "Choose a JPEG or PNG photo under 2 MB."));
+    }
+
     @ExceptionHandler(value={MethodArgumentNotValidException.class})
     ResponseEntity<ApiError> validation(MethodArgumentNotValidException exception) {
         LinkedHashMap<String, String> errors = new LinkedHashMap<String, String>();
