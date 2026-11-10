@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {coordinatePair,refreshDelay,escapeHtml,display} from '../src/live-data.js'
+import {coordinatePair,refreshDelay,escapeHtml,display,preferredMapLayer} from '../src/live-data.js'
 test('coordinates require an actual valid saved pair, including valid zero values',()=>{
  assert.equal(coordinatePair({latitude:-27.75,longitude:29.93}),true)
  assert.equal(coordinatePair({latitude:0,longitude:0}),true)
@@ -15,4 +15,11 @@ test('missing weather values remain missing and seller content is escaped',()=>{
  assert.equal(display(null,'%'),'Not available')
  assert.equal(display(0,' mm'),'0 mm')
  assert.equal(escapeHtml('<img onerror="alert(1)">'),'&lt;img onerror=&quot;alert(1)&quot;&gt;')
+})
+
+test('satellite is preferred when configured and the chosen standard view is respected',()=>{
+ assert.equal(preferredMapLayer(true,null),'satellite')
+ assert.equal(preferredMapLayer(true,'satellite'),'satellite')
+ assert.equal(preferredMapLayer(true,'standard'),'standard')
+ assert.equal(preferredMapLayer(false,'satellite'),'standard')
 })

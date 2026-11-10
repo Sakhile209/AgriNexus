@@ -12,12 +12,12 @@ let offers=[],weatherCalls=0
 await page.addInitScript(auth=>sessionStorage.setItem('agrinexus.session',JSON.stringify(auth)),auth)
 await page.route('https://tile.openstreetmap.org/**',route=>route.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aU1cAAAAASUVORK5CYII=','base64')}))
 await page.route('**/api/v1/**',async route=>{
- const request=route.request(),url=new URL(request.url()),path=url.pathname.replace('/api/v1','');calls.push({path,method:request.method()})
+ const request=route.request(),url=new URL(request.url()),path=url.pathname.replace('/api/v1','');calls.push({path,method:request.method()});if(path.includes('/map-tiles/')){assert.equal(request.headers().authorization,'Bearer isolated-browser-fixture');await route.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aU1cAAAAASUVORK5CYII=','base64')});return}
  const farm=farms.find(f=>path.includes(f.id))||farms[0]
  const weather={available:true,temperatureC:farm===farms[0]?23:16,humidityPercent:65,windSpeedKph:15,windDirectionDegrees:180,currentRainfallMm:0,rainfallMm:1,rainProbability:30,minimumC:12,maximumC:25,provider:'Open-Meteo',location:farm.name,status:'current',retrievedAt:new Date().toISOString(),observedAt:'2026-11-10T10:00',nextRefreshAt:new Date(Date.now()+1800000).toISOString(),forecast:[{date:'2026-11-10',minimumC:12,maximumC:25,rainfallMm:1,rainProbability:30}],advisories:[]}
  let body=[]
  if(path==='/farms')body=farms
- else if(path.endsWith('/map-config'))body={standardTiles:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',satelliteAvailable:false}
+ else if(path.endsWith('/map-config'))body={standardTiles:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',satelliteAvailable:process.env.TEST_SATELLITE==='1',satelliteTiles:`/api/v1/farms/${farm.id}/map-tiles/{z}/{x}/{y}`}
  else if(path.endsWith('/weather')){body=weather;weatherCalls++}
  else if(path.endsWith('/dashboard'))body={farmName:farm.name,activeLivestock:0,activeCrops:0,upcomingVaccinations:0,unreadNotifications:0,livestockBySpecies:{},weather}
  else if(path===`/farms/${farm.id}`){if(request.method()==='PATCH')Object.assign(farm,request.postDataJSON());body=farm}
@@ -35,7 +35,7 @@ try{
  await page.locator('.maplibregl-canvas').waitFor()
  await page.locator('.maplibregl-marker').click()
  await page.getByText('Test Newcastle · Newcastle, KwaZulu-Natal · -27.75, 29.93').waitFor()
- assert.equal(await page.locator('.map-layer option[value=satellite]').isDisabled(),true)
+ assert.equal(await page.locator('.map-layer option[value=satellite]').isDisabled(),process.env.TEST_SATELLITE!=='1');assert.equal(await page.locator('.map-layer').inputValue(),process.env.TEST_SATELLITE==='1'?'satellite':'standard')
  await page.locator('.farm-switcher select').selectOption(farms[1].id)
  await page.locator('#live-weather-detail').getByText('Test Cape Town',{exact:false}).waitFor()
  await page.locator('.maplibregl-marker').click()

@@ -12,6 +12,10 @@ export async function api(path, token, options={}) {
 }
 export function coordinatePair(farm) {return farm?.latitude!=null && farm?.longitude!=null && Number.isFinite(Number(farm.latitude)) && Number.isFinite(Number(farm.longitude)) && Math.abs(Number(farm.latitude))<=90 && Math.abs(Number(farm.longitude))<=180}
 
+export function preferredMapLayer(satelliteAvailable, preference) {
+ return satelliteAvailable && preference!=='standard' ? 'satellite' : 'standard'
+}
+
 export function mountFarmContext(workspace, farmId, token) {
  const controller=new AbortController(); let timer, map, stopped=false, generation=0, selectedFarm, mapLibrary, liveMarker, latestFix, stopGps=()=>{}, tracking=false, mapReady=Promise.resolve()
  const pane=workspace.querySelector('.farm-map-pane'), detail=workspace.querySelector('#live-weather-detail')
@@ -24,8 +28,16 @@ export function mountFarmContext(workspace, farmId, token) {
    if(stopped)return
    const maplibregl=await import('/vendor/maplibre-gl.mjs'); if(stopped)return;mapLibrary=maplibregl
    const standard={version:8,sources:{farm:{type:'raster',tiles:[config.standardTiles],tileSize:256,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>',maxzoom:19}},layers:[{id:'farm',type:'raster',source:'farm'}]}
+   const styleFor=layer=>{
+    const style=structuredClone(standard)
+    if(layer==='satellite'&&config.satelliteAvailable){style.sources.farm.tiles=[location.origin+config.satelliteTiles];style.sources.farm.attribution='© <a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">MapTiler</a> © Airbus DS © OpenStreetMap contributors';style.sources.farm.maxzoom=20}
+    return style
+   }
+   let preference
+   try{preference=localStorage.getItem('agrinexus.map-layer')}catch{}
+   const initialLayer=preferredMapLayer(config.satelliteAvailable,preference)
    const container=pane.querySelector('.live-farm-map')
-   map=new maplibregl.Map({container,style:standard,center:[Number(farm.longitude),Number(farm.latitude)],zoom:13,transformRequest:url=>url.startsWith(location.origin+'/api/')?{url,headers:{Authorization:`Bearer ${token}`}}:{url}})
+   map=new maplibregl.Map({container,style:styleFor(initialLayer),center:[Number(farm.longitude),Number(farm.latitude)],zoom:13,transformRequest:url=>url.startsWith(location.origin+'/api/')?{url,headers:{Authorization:`Bearer ${token}`}}:{url}})
    map.addControl(new maplibregl.NavigationControl(),'bottom-right')
    map.addControl(new maplibregl.FullscreenControl(),'bottom-left')
    const info=document.createElement('div');info.textContent=`${farm.name} · ${farm.municipality || ''}, ${farm.province} · ${farm.latitude}, ${farm.longitude}`
@@ -34,11 +46,11 @@ export function mountFarmContext(workspace, farmId, token) {
    const select=pane.querySelector('.map-layer')
    select.querySelector('[value="satellite"]').disabled=!config.satelliteAvailable
    select.title=config.satelliteAvailable?'Choose map imagery':'Satellite requires a licensed MapTiler key configured on the server'
-   select.addEventListener('change',()=>{
-    const style=structuredClone(standard)
-    if(select.value==='satellite') {style.sources.farm.tiles=[location.origin+config.satelliteTiles];style.sources.farm.attribution='© <a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">MapTiler</a> © Airbus DS © OpenStreetMap contributors';style.sources.farm.maxzoom=20}
-    pane.querySelector('.live-map-message')?.remove();map.setStyle(style)
-   },{signal:controller.signal})
+   select.value=initialLayer
+   select.onchange=()=>{
+    try{localStorage.setItem('agrinexus.map-layer',select.value)}catch{}
+    pane.querySelector('.live-map-message')?.remove();map.setStyle(styleFor(select.value))
+   }
    pane.querySelector('.map-recenter').disabled=deviceOnly
    pane.querySelector('.map-recenter').onclick=()=>{if(coordinatePair(selectedFarm))map.flyTo({center:[Number(selectedFarm.longitude),Number(selectedFarm.latitude)],zoom:13})}
   } catch(error) {if(!stopped)message(error.message)}
