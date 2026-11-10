@@ -25,7 +25,7 @@ AgriNexus is a digital agriculture platform that helps farmers manage livestock,
 2. Start the app:
    `npm start`
 3. Open the frontend at:
-   `http://localhost:3000/`
+   `http://localhost:5174/`
 
 ## Scan to open the website
 
@@ -39,7 +39,7 @@ The reconstructed React and Spring Boot application uses the following local hos
 
 | Service | Host |
 | --- | --- |
-| React frontend | [http://localhost:5173](http://localhost:5173) |
+| React frontend | [http://localhost:5174](http://localhost:5173) |
 | Spring Boot API | [http://localhost:8080](http://localhost:8080) |
 | API status | [http://localhost:8080/api/v1/system/status](http://localhost:8080/api/v1/system/status) |
 | Market prices API | [http://localhost:8080/api/v1/market-prices](http://localhost:8080/api/v1/market-prices) |
