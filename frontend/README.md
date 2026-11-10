@@ -27,3 +27,5 @@ AGRINEXUS_API_TARGET=http://localhost:8082 npm run dev
 The API command requires Java and the existing backend JAR in `../backend/target/`.
 
 See [LIVE_DATA.md](LIVE_DATA.md) for weather, maps, seller listings, source licensing, configuration, and verification instructions.
+
+See [EMAIL_VERIFICATION.md](EMAIL_VERIFICATION.md) for mandatory registration verification, Brevo sender/API configuration, migrations, and test instructions.

@@ -27,6 +27,13 @@ import za.co.agrinexus.shared.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(za.co.agrinexus.auth.verification.VerificationProblem.class)
+    ResponseEntity<ApiError> verification(za.co.agrinexus.auth.verification.VerificationProblem e) {
+        var response=ResponseEntity.status(e.status);
+        if(e.status==429)response.header("Retry-After","60");
+        return response.body(ApiError.of(e.code,e.getMessage()));
+    }
+
     @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
     ResponseEntity<ApiError> requestFailure(org.springframework.web.server.ResponseStatusException e) {
         return ResponseEntity.status(e.getStatusCode()).body(ApiError.of("REQUEST_FAILED", e.getReason() == null ? "Request could not be completed." : e.getReason()));

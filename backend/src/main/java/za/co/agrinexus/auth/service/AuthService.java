@@ -32,29 +32,28 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final za.co.agrinexus.auth.verification.EmailVerificationService verification;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService, za.co.agrinexus.auth.verification.EmailVerificationService verification) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.verification = verification;
     }
 
-    @Transactional
-    public AuthResponse register(RegisterRequest request) {
-        String email = AuthService.normalizeEmail(request.email());
-        if (this.userRepository.existsByEmail(email)) {
-            throw new ConflictException("An account already exists for this email address.");
-        }
-        User user = (User)this.userRepository.save(new User(request.firstName().trim(), request.lastName().trim(), email, request.phoneNumber().trim(), this.passwordEncoder.encode((CharSequence)request.password())));
-        return this.responseFor(user);
+    public za.co.agrinexus.auth.verification.EmailVerificationService.Pending register(RegisterRequest request) {
+        // Encode for both new and existing addresses to reduce registration timing differences.
+        return verification.register(request, this.passwordEncoder.encode(request.password()));
     }
 
     @Transactional(readOnly=true)
     public AuthResponse login(LoginRequest request) {
         String email = AuthService.normalizeEmail(request.email());
         this.authenticationManager.authenticate((Authentication)new UsernamePasswordAuthenticationToken((Object)email, (Object)request.password()));
-        return this.responseFor(this.userRepository.findByEmail(email).orElseThrow());
+        User user=this.userRepository.findByEmail(email).orElseThrow();
+        if(!user.isEmailVerified())throw new za.co.agrinexus.auth.verification.VerificationProblem("EMAIL_NOT_VERIFIED","Please verify your email address before logging in.",403);
+        return this.responseFor(user);
     }
 
     private AuthResponse responseFor(User user) {

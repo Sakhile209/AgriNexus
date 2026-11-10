@@ -36,6 +36,7 @@ public class JwtService {
     }
 
     public IssuedToken issue(User user) {
+        if(!user.isEmailVerified())throw new za.co.agrinexus.auth.verification.VerificationProblem("EMAIL_NOT_VERIFIED","Please verify your email address before logging in.",403);
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(this.expiry);
         JwtClaimsSet claims = JwtClaimsSet.builder().issuer("agrinexus-api").issuedAt(issuedAt).expiresAt(expiresAt).subject(user.getEmail()).claim("role", (Object)user.getRole().name()).claim("userId", (Object)user.getId().toString()).build();

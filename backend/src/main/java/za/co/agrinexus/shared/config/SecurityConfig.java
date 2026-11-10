@@ -63,7 +63,13 @@ import za.co.agrinexus.auth.repository.UserRepository;
 public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return (SecurityFilterChain)http.csrf(csrf -> csrf.disable()).cors(cors -> {}).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(authorize -> ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)authorize.requestMatchers(HttpMethod.GET, new String[]{"/api/v1/system/status", "/api/v1/market-prices", "/api/v1/marketplace/listings"})).permitAll().requestMatchers(HttpMethod.POST, new String[]{"/api/v1/auth/register", "/api/v1/auth/login"})).permitAll().requestMatchers(new String[]{"/actuator/health"})).permitAll().anyRequest()).authenticated()).oauth2ResourceServer(resourceServer -> resourceServer.jwt(jwt -> {})).build();
+        return http.csrf(csrf->csrf.disable()).cors(cors->{})
+            .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(authorize->authorize
+              .requestMatchers(HttpMethod.GET,"/api/v1/system/status","/api/v1/market-prices","/api/v1/marketplace/listings").permitAll()
+              .requestMatchers(HttpMethod.POST,"/api/v1/auth/register","/api/v1/auth/login","/api/v1/auth/verification/resend","/api/v1/auth/verification/confirm").permitAll()
+              .requestMatchers("/actuator/health").permitAll().anyRequest().authenticated())
+            .oauth2ResourceServer(resourceServer->resourceServer.jwt(jwt->{})).build();
     }
 
     @Bean
@@ -97,7 +103,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(SecretKey key) {
-        return NimbusJwtDecoder.withSecretKey((SecretKey)key).macAlgorithm(MacAlgorithm.HS256).build();
+    JwtDecoder jwtDecoder(SecretKey key, UserRepository users) {
+        NimbusJwtDecoder decoder=NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
+        decoder.setJwtValidator(new org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator<>(
+          org.springframework.security.oauth2.jwt.JwtValidators.createDefaultWithIssuer("agrinexus-api"),
+          token->users.findByEmail(token.getSubject()).filter(user->user.isEmailVerified()
+            && user.getAccountStatus()==AccountStatus.ACTIVE
+            && user.getId().toString().equals(token.getClaimAsString("userId")))
+            .map(user->org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.success())
+            .orElseGet(()->org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.failure(new org.springframework.security.oauth2.core.OAuth2Error("invalid_token","Account cannot access protected features.",null)))));
+        return decoder;
     }
 }

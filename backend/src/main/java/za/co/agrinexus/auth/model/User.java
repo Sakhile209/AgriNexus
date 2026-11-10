@@ -51,6 +51,14 @@ public class User {
     @Column(name="updated_at", nullable=false)
     private Instant updatedAt;
 
+    @Column(name="email_verified", nullable=false)
+    private boolean emailVerified;
+    @Column(name="email_verified_at")
+    private Instant emailVerifiedAt;
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public Instant getEmailVerifiedAt() { return emailVerifiedAt; }
+
     protected User() {
     }
 

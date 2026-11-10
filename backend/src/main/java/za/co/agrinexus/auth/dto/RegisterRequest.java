@@ -15,4 +15,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegisterRequest(@NotBlank @Size(max=100) @NotBlank @Size(max=100) String firstName, @NotBlank @Size(max=100) @NotBlank @Size(max=100) String lastName, @NotBlank @Email @Size(max=254) @NotBlank @Email @Size(max=254) String email, @NotBlank @Pattern(regexp="^[+0-9][0-9 ()-]{6,29}$", message="must be a valid phone number") @NotBlank @Pattern(regexp="^[+0-9][0-9 ()-]{6,29}$", message="must be a valid phone number") String phoneNumber, @NotBlank @Size(min=10, max=128) @NotBlank @Size(min=10, max=128) String password) {
+    @jakarta.validation.constraints.AssertTrue(message="Password must be at most 72 UTF-8 bytes for the configured password encoder")
+    public boolean isPasswordLengthSafe() {
+        return password == null || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length <= 72;
+    }
 }
