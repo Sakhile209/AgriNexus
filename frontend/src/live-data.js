@@ -1,3 +1,4 @@
+import {watchLiveLocation,locationError} from './geolocation.js'
 export const provinces = ['Eastern Cape','Free State','Gauteng','KwaZulu-Natal','Limpopo','Mpumalanga','North West','Northern Cape','Western Cape']
 export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
 export const money = value => value == null ? 'Not available' : new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(value)
@@ -12,23 +13,23 @@ export async function api(path, token, options={}) {
 export function coordinatePair(farm) {return farm?.latitude!=null && farm?.longitude!=null && Number.isFinite(Number(farm.latitude)) && Number.isFinite(Number(farm.longitude)) && Math.abs(Number(farm.latitude))<=90 && Math.abs(Number(farm.longitude))<=180}
 
 export function mountFarmContext(workspace, farmId, token) {
- const controller=new AbortController(); let timer, map, stopped=false, generation=0
+ const controller=new AbortController(); let timer, map, stopped=false, generation=0, selectedFarm, mapLibrary, liveMarker, latestFix, stopGps=()=>{}, tracking=false, mapReady=Promise.resolve()
  const pane=workspace.querySelector('.farm-map-pane'), detail=workspace.querySelector('#live-weather-detail')
  const e=escapeHtml
  const message=(text)=>{let box=pane.querySelector('.live-map-message');if(!box){box=document.createElement('p');box.className='live-map-message';pane.append(box)}box.textContent=text}
- async function drawMap(farm) {
+ async function drawMap(farm,deviceOnly=false) {
   if(!coordinatePair(farm)){message('Save this farm’s GPS coordinates in Settings to display its location.');return}
   try {
    const config=await api(`/farms/${farmId}/map-config`,token,{signal:controller.signal})
    if(stopped)return
-   const maplibregl=await import('/vendor/maplibre-gl.mjs'); if(stopped)return
+   const maplibregl=await import('/vendor/maplibre-gl.mjs'); if(stopped)return;mapLibrary=maplibregl
    const standard={version:8,sources:{farm:{type:'raster',tiles:[config.standardTiles],tileSize:256,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>',maxzoom:19}},layers:[{id:'farm',type:'raster',source:'farm'}]}
    const container=pane.querySelector('.live-farm-map')
    map=new maplibregl.Map({container,style:standard,center:[Number(farm.longitude),Number(farm.latitude)],zoom:13,transformRequest:url=>url.startsWith(location.origin+'/api/')?{url,headers:{Authorization:`Bearer ${token}`}}:{url}})
    map.addControl(new maplibregl.NavigationControl(),'bottom-right')
    map.addControl(new maplibregl.FullscreenControl(),'bottom-left')
    const info=document.createElement('div');info.textContent=`${farm.name} · ${farm.municipality || ''}, ${farm.province} · ${farm.latitude}, ${farm.longitude}`
-   new maplibregl.Marker({color:'#16a45a'}).setLngLat([Number(farm.longitude),Number(farm.latitude)]).setPopup(new maplibregl.Popup().setDOMContent(info)).addTo(map)
+   if(!deviceOnly)new maplibregl.Marker({color:'#16a45a'}).setLngLat([Number(farm.longitude),Number(farm.latitude)]).setPopup(new maplibregl.Popup().setDOMContent(info)).addTo(map)
    map.on('error',()=>message('Some map tiles could not load. Check your connection or try the standard layer.'))
    const select=pane.querySelector('.map-layer')
    select.querySelector('[value="satellite"]').disabled=!config.satelliteAvailable
@@ -38,7 +39,8 @@ export function mountFarmContext(workspace, farmId, token) {
     if(select.value==='satellite') {style.sources.farm.tiles=[location.origin+config.satelliteTiles];style.sources.farm.attribution='© <a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">MapTiler</a> © Airbus DS © OpenStreetMap contributors';style.sources.farm.maxzoom=20}
     pane.querySelector('.live-map-message')?.remove();map.setStyle(style)
    },{signal:controller.signal})
-   pane.querySelector('.map-recenter').addEventListener('click',()=>map.flyTo({center:[Number(farm.longitude),Number(farm.latitude)],zoom:13}),{signal:controller.signal})
+   pane.querySelector('.map-recenter').disabled=deviceOnly
+   pane.querySelector('.map-recenter').onclick=()=>{if(coordinatePair(selectedFarm))map.flyTo({center:[Number(selectedFarm.longitude),Number(selectedFarm.latitude)],zoom:13})}
   } catch(error) {if(!stopped)message(error.message)}
  }
  async function weather() {
@@ -56,9 +58,44 @@ export function mountFarmContext(workspace, farmId, token) {
   } catch(error) {if(!stopped) {detail.textContent=`Weather unavailable: ${error.message}`;const retry=document.createElement('button');retry.textContent='Retry';retry.onclick=weather;detail.append(retry);timer=setTimeout(weather,300000)}}
   finally {if(!stopped)detail.removeAttribute('aria-busy')}
  }
- api(`/farms/${farmId}`,token,{signal:controller.signal}).then(f=>{if(!stopped)drawMap(f)}).catch(error=>{if(!stopped)message(error.message)})
+ const gpsButton=pane.querySelector('.map-live-location'),gpsPanel=pane.querySelector('.live-location-panel'),gpsStatus=pane.querySelector('.live-location-status'),saveGps=pane.querySelector('.save-gps-farm')
+ function stopTracking(){tracking=false;stopGps();liveMarker?.remove();liveMarker=null;latestFix=null;gpsButton.textContent='Use live location';saveGps.disabled=true}
+ gpsButton.addEventListener('click',()=>{
+  gpsPanel.hidden=false
+  if(tracking){stopTracking();gpsStatus.textContent='Live location stopped. Your saved farm location is unchanged.';return}
+  tracking=true;gpsButton.textContent='Stop live location';gpsStatus.textContent='Waiting for your device location. Allow location access when your browser asks.'
+  stopGps=watchLiveLocation(async fix=>{
+   latestFix=fix
+   gpsStatus.textContent=`Live device GPS: ${fix.latitude.toFixed(6)}, ${fix.longitude.toFixed(6)} · accuracy ±${Math.round(fix.accuracy)} m · updated ${timestamp(fix.timestamp)}. Save this as the farm location only when you are at the farm.`
+   saveGps.disabled=false
+   await mapReady
+   if(stopped||!tracking)return
+   if(!map){mapReady=drawMap({...selectedFarm,latitude:fix.latitude,longitude:fix.longitude},true);await mapReady}
+   if(stopped||!tracking||!map||!latestFix)return
+   if(!liveMarker){const element=document.createElement('div');element.className='live-device-marker';element.setAttribute('aria-label','Your live device location');liveMarker=new mapLibrary.Marker({element}).setPopup(new mapLibrary.Popup().setText('Your live device location')).setLngLat([latestFix.longitude,latestFix.latitude]).addTo(map)}
+   liveMarker.setLngLat([latestFix.longitude,latestFix.latitude]);map.flyTo({center:[latestFix.longitude,latestFix.latitude],zoom:Math.max(map.getZoom(),15)})
+  },error=>{if(stopped)return;if(error?.code===2||error?.code===3){latestFix=null;saveGps.disabled=true;gpsStatus.textContent=locationError(error)+' Waiting for another live fix.'}else{stopTracking();gpsStatus.textContent=locationError(error)}})
+ },{signal:controller.signal})
+ saveGps.addEventListener('click',async()=>{
+  if(!latestFix||!selectedFarm||stopped)return
+  const fix={...latestFix};saveGps.disabled=true
+  try{
+   // Fetch latest details immediately before PATCH so profile edits are preserved.
+   const current=await api(`/farms/${farmId}`,token,{signal:controller.signal})
+   const body=Object.fromEntries(['name','farmType','province','municipality','sizeValue','sizeUnit','mainActivities'].map(k=>[k,current[k]??null]))
+   body.latitude=Number(fix.latitude.toFixed(6));body.longitude=Number(fix.longitude.toFixed(6))
+   const updated=await api(`/farms/${farmId}`,token,{method:'PATCH',body:JSON.stringify(body),signal:controller.signal})
+   if(stopped)return
+   selectedFarm=updated;map?.remove();map=null;liveMarker=null;mapReady=drawMap(updated);await mapReady
+   if(stopped)return
+   gpsStatus.textContent=`Farm GPS saved: ${updated.latitude}, ${updated.longitude}. Farm weather now uses this location.`
+   clearTimeout(timer);weather()
+  }catch(error){if(!stopped)gpsStatus.textContent=`Could not save farm location: ${error.message}`}
+  finally{if(!stopped)saveGps.disabled=!latestFix}
+ },{signal:controller.signal})
+ api(`/farms/${farmId}`,token,{signal:controller.signal}).then(f=>{if(!stopped){selectedFarm=f;gpsButton.disabled=false;mapReady=drawMap(f)}}).catch(error=>{if(!stopped)message(error.message)})
  weather()
- return ()=>{stopped=true;generation++;clearTimeout(timer);controller.abort();map?.remove()}
+ return ()=>{stopped=true;generation++;clearTimeout(timer);controller.abort();stopTracking();map?.remove()}
 }
 
 export function openMarketplace(token, defaultProvince='') {

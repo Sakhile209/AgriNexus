@@ -23,7 +23,7 @@ npm run dev
 
 Open http://localhost:5174. The API runs on 8081 to avoid the unrelated service on 8080. Java 21+ is required. PostgreSQL connection settings remain `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. `AGRINEXUS_API_TARGET` overrides the frontend proxy target. Do not expose the preview server publicly.
 
-Register or log in, select a farm, and save its latitude and longitude in Settings. Weather and maps use these saved coordinates, never the browser's device location or a geocoded municipality. Existing farms without coordinates stay intact and display a location-required message. Coordinates accept valid global ranges (including South African offshore territories), require a complete pair, and must be entered accurately by the farmer; numerical validation cannot establish land ownership or boundary accuracy.
+Register or log in, select a farm, and save its latitude and longitude in Settings. Farm weather and the farm marker use these saved coordinates, never a geocoded municipality. The optional live GPS control can also display your device's current position. Existing farms without coordinates stay intact and display a location-required message. Coordinates accept valid global ranges (including South African offshore territories), require a complete pair, and must be entered accurately by the farmer; numerical validation cannot establish land ownership or boundary accuracy.
 
 ## Weather
 
@@ -155,3 +155,13 @@ PLAYWRIGHT_MODULE=/tmp/agrinexus-browser/node_modules/playwright/index.mjs \
 CHROMIUM_PATH=/absolute/path/to/chrome \
 node scripts/verify-live.mjs
 ```
+
+## Live device GPS
+
+Click **Use live location** on the dashboard map and grant the browser's location permission. The blue device marker follows fresh device readings; the status panel shows coordinates, reported accuracy, and update time. Click **Stop live location** to clear the watch. Switching farm, leaving the dashboard, or logging out also stops tracking. No location request starts automatically.
+
+While physically at the farm, click **Save GPS as farm location** to persist the displayed GPS position for the selected farm. This explicit action retains the latest other farm details, saves coordinates through the existing authenticated owner-scoped API, and refreshes the farm map and weather. Device movement alone never changes farm records.
+
+Location requires localhost or HTTPS and browser/device permission. HTTP over a LAN IP may not support geolocation. A desktop may provide a less precise network-based fix rather than GPS; reported accuracy is displayed rather than claiming exact positioning. Denied permission, unsupported browsers, unavailable fixes, and timeouts have retryable error messages. Reference: https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition .
+
+Live-GPS follow-up verification: **6 frontend tests and 14 isolated browser checks passed**, including device movement, recovery from a temporary location-service interruption, explicit GPS saving, weather refresh after saving, and stopping tracking. Browser GPS was simulated only inside the test context; no real farm coordinates were changed by the browser tests.

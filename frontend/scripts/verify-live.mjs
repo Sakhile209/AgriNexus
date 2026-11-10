@@ -20,7 +20,7 @@ await page.route('**/api/v1/**',async route=>{
  else if(path.endsWith('/map-config'))body={standardTiles:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',satelliteAvailable:false}
  else if(path.endsWith('/weather')){body=weather;weatherCalls++}
  else if(path.endsWith('/dashboard'))body={farmName:farm.name,activeLivestock:0,activeCrops:0,upcomingVaccinations:0,unreadNotifications:0,livestockBySpecies:{},weather}
- else if(path===`/farms/${farm.id}`)body=farm
+ else if(path===`/farms/${farm.id}`){if(request.method()==='PATCH')Object.assign(farm,request.postDataJSON());body=farm}
  else if(path==='/market-prices/status')body={prices:[],sources:[{source:'Test connector',state:'not_configured',message:'No licensed feed configured'}]}
  else if(path==='/marketplace/listings'&&request.method()==='POST'){body={...request.postDataJSON(),id:'33333333-3333-3333-3333-333333333333',active:true,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};offers=[body]}
  else if(path.startsWith('/marketplace/listings/')&&request.method()==='PATCH'){const data=request.postDataJSON();offers=[{...offers[0],...data.listing,active:data.active}];body=offers[0]}
@@ -42,6 +42,13 @@ try{
  await page.getByText('Test Cape Town · Cape Town, Western Cape · -33.93, 18.42').waitFor()
  const before=weatherCalls;await page.getByRole('button',{name:'Refresh',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('#live-weather-detail').hasAttribute('aria-busy'));assert.ok(weatherCalls>before)
  const beforeAutomatic=weatherCalls;await page.clock.fastForward(1800001);await page.waitForFunction(()=>!document.querySelector('#live-weather-detail').hasAttribute('aria-busy'));assert.ok(weatherCalls>beforeAutomatic)
+ await page.clock.resume()
+ await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:-33.94,longitude:18.43,accuracy:7})
+ await page.getByRole('button',{name:'Use live location',exact:true}).click();await page.getByText('Live device GPS: -33.940000, 18.430000',{exact:false}).waitFor();await page.locator('.live-device-marker').waitFor()
+ assert.equal(calls.filter(c=>c.method==='PATCH').length,0)
+ await page.context().setGeolocation({latitude:-33.95,longitude:18.44,accuracy:9});await page.getByText('Live device GPS: -33.950000, 18.440000',{exact:false}).waitFor()
+ await page.getByRole('button',{name:'Save GPS as farm location',exact:true}).click();await page.getByText('Farm GPS saved: -33.95, 18.44.',{exact:false}).waitFor();assert.equal(farms[1].latitude,-33.95);assert.equal(farms[1].longitude,18.44)
+ await page.getByRole('button',{name:'Stop live location',exact:true}).click();await page.getByText('Live location stopped.',{exact:false}).waitFor();assert.equal(await page.locator('.live-device-marker').count(),0)
  await page.locator('[data-home]').click()
  await page.getByText('No licensed feed configured').waitFor()
  await page.getByRole('button',{name:'Create listing',exact:true}).click()
@@ -55,5 +62,5 @@ try{
  await page.getByRole('button',{name:'Close marketplace'}).click()
  await page.setViewportSize({width:390,height:844});await page.locator('.live-farm-map').scrollIntoViewIfNeeded();assert.ok(await page.locator('.live-farm-map').isVisible())
  assert.deepEqual(errors,[])
- console.log(JSON.stringify({passed:['selected farm weather','selected farm map coordinates','satellite configuration gate','manual weather refresh','automatic weather refresh','missing licensed feed state','seller create','seller availability update','mobile map visibility','no browser exceptions'],weatherCalls,apiRequests:calls.length}))
-}finally{await browser.close()}
+ console.log(JSON.stringify({passed:['selected farm weather','selected farm map coordinates','satellite configuration gate','manual weather refresh','automatic weather refresh','live GPS updates','GPS does not save automatically','explicit farm GPS save','stop GPS tracking','missing licensed feed state','seller create','seller availability update','mobile map visibility','no browser exceptions'],weatherCalls,apiRequests:calls.length}))
+}catch(error){console.error(JSON.stringify({errors,gpsStatus:await page.locator('.live-location-status').textContent().catch(()=>null)}));throw error}finally{await browser.close()}
